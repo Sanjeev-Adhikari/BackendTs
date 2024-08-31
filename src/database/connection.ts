@@ -1,4 +1,8 @@
 import {Sequelize} from 'sequelize-typescript'
+import User from './models/User'
+import Product from './models/Product'
+import Category from './models/Category'
+import Cart from './models/Cart'
 
 const sequelize = new Sequelize({
     database : process.env.DB_NAME,
@@ -22,4 +26,21 @@ sequelize.sync({force: false})
     console.log("synced!!!")
 })
 
+//Relationships
+//relation between user and product
+User.hasMany(Product,{foreignKey: 'userId'})
+Product.belongsTo(User,{foreignKey : 'userId'})
+//relation between product and category
+Product.belongsTo(Category, {foreignKey : 'categoryId'})
+Category.hasOne(Product, {foreignKey : 'categoryId'})
+
+//User-Cart relationship
+User.hasMany(Cart, {foreignKey : 'userId'})
+Cart.belongsTo(User, {foreignKey : 'userId'})
+
+//Product-cart relationship
+Product.hasMany(Cart, {foreignKey : 'productId'})
+Cart.belongsTo(Product, {foreignKey : 'productId'})
+
 export default sequelize
+
