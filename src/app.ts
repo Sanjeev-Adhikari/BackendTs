@@ -11,8 +11,16 @@ import orderRoute from './routes/orderRoute'
 import adminSeeder from './adminSeeder'
 import categoryController from './controllers/categoryController'
 
+import cors from 'cors'
+
+
 const app:Application = express()
 const PORT:number = 3000
+
+//setting cors to connect frontend and backend
+app.use(cors({
+    origin : "*"
+}))
 // Middleware to parse JSON bodies
 app.use(express.json());
 
@@ -21,10 +29,11 @@ app.use(express.urlencoded({ extended: true }));
 
 //admin seeder
 adminSeeder()
+app.use(express.static("./src/uploads/"))
 
 //Routes
 app.use("", userRoute)
-app.use("/admin/product", productRoute)
+app.use("/product", productRoute)
 app.use("/admin/category", categoryRoute)
 app.use("/customer/cart", cartRoute)
 app.use("/order", orderRoute)

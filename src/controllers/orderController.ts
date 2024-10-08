@@ -8,6 +8,7 @@ import axios from 'axios'
 import Product from '../database/models/Product'
 import Category from '../database/models/Category'
 import User from '../database/models/User'
+import Cart from '../database/models/Cart'
 
 class ExtendedOrder extends Order{
     declare paymentId : string | null
@@ -33,11 +34,18 @@ class OrderController{
             totalAmount,
             paymentId : paymentData.id
         })
+        let responseOrderData;
         for (var i = 0; i<items.length; i++){
-           await OrderDetail.create({
+            responseOrderData = await OrderDetail.create({
                 quantity : items[i].quantity,
                 productId : items[i].productId,
                 orderId : orderData.id
+            })
+            await Cart.destroy({
+                where : {
+                    productId : items[i].productId,
+                    userId : userId
+                }
             })
         }
         if(paymentDetails.paymentMethod === PaymentMethod.Khalti){
@@ -62,11 +70,13 @@ class OrderController{
             res.status(200).json({
                 message : "Order placed successfully",
                 url : khaltiResponse.payment_url,
+                data: responseOrderData
             })  
             return
         }
         res.status(200).json({
-            message : "Order placed successfully"
+            message : "Order placed successfully",
+            data: responseOrderData
         })
         return
     }
@@ -105,6 +115,7 @@ class OrderController{
         const userId = req.user?.id
 
         const orders = await Order.findAll({
+            order: [['createdAt', 'DESC']],
             where : {
                 userId : userId
             },
@@ -171,7 +182,7 @@ class OrderController{
 
         res.status(404).json({
             message : "No orderdetails with that id",
-            data : []
+          
         })
     }
 

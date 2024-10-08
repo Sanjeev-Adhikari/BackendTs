@@ -34,7 +34,7 @@ class Order extends Model{
     declare shippingAddress:string
 
     @Column({
-        type : DataType.FLOAT,
+        type : DataType.NUMBER,
         allowNull : false
     })
     declare totalAmount:number
